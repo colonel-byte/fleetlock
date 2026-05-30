@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/poseidon/fleetlock/internal/drainer"
+	drain "github.com/poseidon/fleetlock/internal/drainer"
 )
 
 // DrainNode matches a Zincati request to a node, cordons the node, and evicts
@@ -21,8 +21,9 @@ func (s *Server) DrainNode(ctx context.Context, id string) error {
 	}
 
 	drainer := drain.New(&drain.Config{
-		Client: s.kubeClient,
-		Logger: s.log,
+		Client:  s.kubeClient,
+		Logger:  s.log,
+		Timeout: s.drainTimeout,
 	})
 	return drainer.Drain(ctx, node.GetName())
 }
@@ -36,8 +37,9 @@ func (s *Server) UncordonNode(ctx context.Context, id string) error {
 	}
 
 	drainer := drain.New(&drain.Config{
-		Client: s.kubeClient,
-		Logger: s.log,
+		Client:  s.kubeClient,
+		Logger:  s.log,
+		Timeout: s.drainTimeout,
 	})
 	return drainer.Uncordon(ctx, node.GetName())
 }
