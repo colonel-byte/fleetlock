@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: '0 0 * * 0'
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   sync:
@@ -56,6 +59,10 @@ jobs:
       - name: Push tags to origin
         run: |
           git push --tags origin
+
+      - name: Change base image in docker file
+        run: |
+          sed -i -E 's#^FROM docker.io/alpine:.+$#FROM cgr.dev/chainguard/wolfi-base:latest#g' ./Dockerfile
 
       # borrowed from https://github.com/poseidon/fleetlock/compare/main...craigcabrey:fleetlock:main
       - name: Build Image
